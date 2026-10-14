@@ -135,13 +135,21 @@ function draw() {
   bob.toon();
 
   if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob)) {
-    noLoop();
+    eindscherm(false);
+  } else if (eve.gehaald) {
+    eindscherm(true);
   }
+}
 
-  if (eve.gehaald) {
+function eindscherm(gewonnen) {
+  if (gewonnen) {
     background('green');
     fill('white');
     text("Je hebt gewonnen!",30,300);
-    noLoop();
+  } else {
+    background('red');
+    fill('black');
+    text("Je hebt verloren!",30,300);
   }
+  noLoop();
 }
