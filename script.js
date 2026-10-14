@@ -1,7 +1,7 @@
 class Raster {
   constructor(r,k) {
-    this.aantalRijen = r;
-    this.aantalKolommen = k;
+    this.aantalRijen = 12;
+    this.aantalKolommen = 18;
     this.celGrootte = null;
   }
 
