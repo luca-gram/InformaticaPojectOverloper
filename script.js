@@ -5,6 +5,8 @@ class Raster {
     this.celGrootte = null;
   }
 
+  
+
   berekenCelGrootte() {
     this.celGrootte = canvas.width / this.aantalKolommen;
   }
@@ -122,6 +124,25 @@ function setup() {
   bob = new Vijand(600,400);
   bob.stapGrootte = 1*eve.stapGrootte;
   bob.sprite = loadImage("images/sprites/Bob100px/Bob.png");  
+
+  cindy = new Vijand(500,300);
+  cindy.stapGrootte = 1*eve.stapGrootte;
+  cindy.sprite = loadImage("images/sprites/Bob100px/Bob.png");  
+}
+
+function eindScherm(gewonnen, verloren) {
+  if (gewonnen) {
+    background('green');
+    fill('white');
+    text("Je hebt gewonnen!",30,300);
+    noLoop();
+   } else if (verloren) {
+    background('red');
+    fill('black');
+    textAlign(CENTER, CENTER);
+    text("Je hebt verloren!", width / 2, height / 2);
+    noLoop();
+  }
 }
 
 function draw() {
@@ -130,26 +151,15 @@ function draw() {
   eve.beweeg();
   alice.beweeg();
   bob.beweeg();
+  cindy.beweeg();
   eve.toon();
   alice.toon();
   bob.toon();
-
-  if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob)) {
-    eindscherm(false);
-  } else if (eve.gehaald) {
-    eindscherm(true);
+  cindy.toon();
+ 
+  if (eve.gehaald) {
+    eindScherm(true, false);
+} else if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob)) {
+    eindScherm(false, true);
   }
-}
-
-function eindscherm(gewonnen) {
-  if (gewonnen) {
-    background('green');
-    fill('white');
-    text("Je hebt gewonnen!",30,300);
-  } else {
-    background('red');
-    fill('black');
-    text("Je hebt verloren!",30,300);
-  }
-  noLoop();
 }

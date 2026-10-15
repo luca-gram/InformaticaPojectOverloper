@@ -1,5 +1,5 @@
 entrypoint = "script.js"
-modules = ["web", "nodejs-24"]
+modules = ["web"]
 
 [nix]
 channel = "stable-24_11"
