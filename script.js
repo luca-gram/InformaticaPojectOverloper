@@ -9,8 +9,6 @@ class Raster {
     this.celGrootte = null;
   }
 
-  
-
   berekenCelGrootte() {
     this.celGrootte = canvas.width / this.aantalKolommen;
   }
@@ -26,6 +24,29 @@ class Raster {
     }
     pop();
   }
+
+achtergrondVeranderen() {
+  let kolom = floor(mouseX / this.celGrootte);
+  let rij = floor(mouseY / this.celGrootte);
+
+  if (
+    mouseX >= 0 &&
+    mouseX < canvas.width &&
+    mouseY >= 0 &&
+    mouseY < canvas.height
+  ) {
+    push();
+    noStroke();
+    fill('lightblue');
+    rect(
+      kolom * this.celGrootte,
+      rij * this.celGrootte,
+      this.celGrootte,
+      this.celGrootte
+    );
+    pop();
+  }
+}
 }
 
 class Jos {
@@ -36,8 +57,15 @@ class Jos {
     this.frameNummer =  3;
     this.stapGrootte = null;
     this.gehaald = false;
+    this.levens = 3
   }
 
+verliesLevens() {
+  this.levens--;
+  this.x = 400;
+  this.y = 300;
+}
+  
   beweeg() {
     if (keyIsDown(65)) {
       this.x -= this.stapGrootte;
@@ -134,6 +162,17 @@ function setup() {
   cindy.sprite = loadImage("images/sprites/Bob100px/Bob.png");  
 }
 
+function AantalLevens() {
+  push();
+  fill('white');
+  stroke('black');
+  strokeWeight(3);
+  textSize(30);
+  textAlign(LEFT, TOP);
+  text("levens: " + eve.levens, 10, 30);
+  pop();
+}
+
 function tekenPiramide(n, x, y) {
   if (n > 0) {
     for (var nr = 0; nr < n; nr++) {
@@ -182,7 +221,14 @@ function eindScherm(gewonnen, verloren) {
 function draw() {
   background(brug);
   tekenPiramideAchtergrond();
+  raster.achtergrondVeranderen();
   raster.teken();
+  push();
+  noFill();
+  stroke('blue');
+  strokeWeight(4);
+  rect(2, 2, width - 4, height - 4);
+  pop();
   eve.beweeg();
   alice.beweeg();
   bob.beweeg();
@@ -191,10 +237,15 @@ function draw() {
   alice.toon();
   bob.toon();
   cindy.toon();
- 
+  AantalLevens();
+
+  if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob) || eve.wordtGeraakt(cindy)) {
+    eve.verliesLevens();
+  }
+
   if (eve.gehaald) {
     eindScherm(true, false);
-} else if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob) || eve.wordtGeraakt(bob)) {
+  } else if (eve.levens <= 0) {
     eindScherm(false, true);
   }
 }
