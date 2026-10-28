@@ -13,6 +13,7 @@ class Raster {
     this.celGrootte = canvas.width / this.aantalKolommen;
   }
 
+// als je cursor over rand beweegt veranderd de achtergrond
   muisOpRand() {
     let kolom = floor(mouseX / this.celGrootte);
     let rij = floor(mouseY / this.celGrootte);
@@ -36,21 +37,7 @@ class Raster {
     pop();
   }
 
-  achtergrondVeranderen() {
-    let kolom = floor(mouseX / this.celGrootte);
-    let rij = floor(mouseY / this.celGrootte);
-
-    if (mouseX >= 0 && mouseX < canvas.width &&
-        mouseY >= 0 && mouseY < canvas.height) {
-      push();
-      noStroke();
-      fill('lightblue');
-      rect(kolom * this.celGrootte, rij * this.celGrootte,
-           this.celGrootte, this.celGrootte);
-      pop();
-    }
-  }
-
+  //dit tekent de rand
   tekenRand() {
     push();
     noStroke();
@@ -86,6 +73,7 @@ class Jos {
     this.y = 300;
   }
 
+  // controls
   beweeg() {
     if (keyIsDown(65)) {
       this.x -= this.stapGrootte;
@@ -246,7 +234,7 @@ function setup() {
     eve.animatie.push(frameEve);
   }
 
-  // raketten: willekeurige kolom rechts van Eve (kolom 9 t/m 17)
+  // laadt de afbeelding en waar het beweegt
   raket1 = new Raket(floor(random(9, 18)) * raster.celGrootte, 110);
   raket1.sprite = loadImage("images/sprites/raket.png");
 
@@ -271,6 +259,7 @@ function setup() {
   cindy.sprite = loadImage("images/sprites/Bob100px/Bob.png");
 }
 
+// zorgt ervoor dat je levens hebt
 function AantalLevens() {
   push();
   fill('white');
@@ -300,8 +289,8 @@ function tekenPiramideAchtergrond() {
   push();
 
   hoogte = breedte / 2;
-  fill(255, 220, 0, 120);      // geel, doorzichtig
-  stroke(200, 160, 0, 180);    // donkergele rand
+  fill(255, 220, 0, 120);
+  stroke(200, 160, 0, 180);
 
   var x = (canvas.width - aantalLagen * breedte) / 2;
   var y = (canvas.height - aantalLagen * hoogte) / 2;
@@ -312,6 +301,7 @@ function tekenPiramideAchtergrond() {
   pop();
 }
 
+// zorgt voor de winst of verlies scherm
 function eindScherm(gewonnen, verloren) {
   if (gewonnen) {
     background('green');
@@ -327,18 +317,17 @@ function eindScherm(gewonnen, verloren) {
   }
 }
 
+//als de muis op de rand is dan veranderd de achtergrond
 function draw() {
   if (raster.muisOpRand()) {
-    background('orange');   // cursor op de blauwe rand: andere achtergrond
+    background('orange');
   } else {
     background(brug);
   }
 
   tekenPiramideAchtergrond();
-  raster.achtergrondVeranderen();
   raster.teken();
   raster.tekenRand();
-
   eve.beweeg();
   alice.beweeg();
   bob.beweeg();
@@ -347,7 +336,6 @@ function draw() {
   raket2.beweeg();
   raket3.beweeg();
   bal.beweeg();
-
   bal.toon();
   eve.toon();
   alice.toon();
