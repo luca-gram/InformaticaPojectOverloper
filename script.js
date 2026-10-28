@@ -1,3 +1,7 @@
+var aantalLagen = 12;
+var breedte = 90;
+var hoogte;
+
 class Raster {
   constructor(r,k) {
     this.aantalRijen = 12;
@@ -130,6 +134,36 @@ function setup() {
   cindy.sprite = loadImage("images/sprites/Bob100px/Bob.png");  
 }
 
+function tekenPiramide(n, x, y) {
+  if (n > 0) {
+    for (var nr = 0; nr < n; nr++) {
+      rect(x + nr * breedte, y, breedte, hoogte);
+    }
+
+    tekenPiramide(
+      n - 1,
+      x + breedte / 2,
+      y + hoogte
+    );
+  }
+}
+
+function tekenPiramideAchtergrond() {
+  push();
+
+  hoogte = breedte / 2;
+  fill('lightslategray');
+  stroke('darkslategray');
+
+  var x = (canvas.width - aantalLagen * breedte) / 2;
+  var y = (canvas.height - aantalLagen * hoogte) / 2;
+
+  translate(0, y);
+  tekenPiramide(aantalLagen, x, 0);
+
+  pop();
+}
+
 function eindScherm(gewonnen, verloren) {
   if (gewonnen) {
     background('green');
@@ -147,6 +181,7 @@ function eindScherm(gewonnen, verloren) {
 
 function draw() {
   background(brug);
+  tekenPiramideAchtergrond();
   raster.teken();
   eve.beweeg();
   alice.beweeg();
