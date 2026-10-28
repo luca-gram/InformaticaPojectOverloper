@@ -179,6 +179,52 @@ class Raket {
   }
 }
 
+class PingPongBal {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.dx = raster.celGrootte;
+    this.dy = raster.celGrootte;
+    this.opgegeten = false;
+    if (frameCount % 2 != 0) {
+      return;
+    }
+  }
+
+  beweeg() {
+    if (this.opgegeten) {
+      return;
+    }
+
+    var maxX = canvas.width - raster.celGrootte;
+    var maxY = canvas.height - raster.celGrootte;
+
+    if (this.x + this.dx < 0 || this.x + this.dx > maxX) {
+      this.dx = -this.dx;
+    }
+    if (this.y + this.dy < 0 || this.y + this.dy > maxY) {
+      this.dy = -this.dy;
+    }
+
+    this.x += this.dx;
+    this.y += this.dy;
+  }
+
+  toon() {
+    if (this.opgegeten) {
+      return;
+    }
+    push();
+    stroke('grey');
+    strokeWeight(2);
+    fill('white');
+    ellipse(this.x + raster.celGrootte / 2,
+            this.y + raster.celGrootte / 2,
+            raster.celGrootte * 0.6);
+    pop();
+  }
+}
+
 function preload() {
   brug = loadImage("images/backgrounds/dame_op_brug_1800.jpg");
 }
@@ -209,6 +255,8 @@ function setup() {
 
   raket3 = new Raket(floor(random(9, 18)) * raster.celGrootte, 100);
   raket3.sprite = loadImage("images/sprites/raket.png");
+
+  bal = new PingPongBal(5 * raster.celGrootte, 2 * raster.celGrootte);
 
   alice = new Vijand(700, 200);
   alice.stapGrootte = 1 * eve.stapGrootte;
@@ -298,7 +346,9 @@ function draw() {
   raket1.beweeg();
   raket2.beweeg();
   raket3.beweeg();
+  bal.beweeg();
 
+  bal.toon();
   eve.toon();
   alice.toon();
   bob.toon();
@@ -311,6 +361,11 @@ function draw() {
   if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob) || eve.wordtGeraakt(cindy) ||
       eve.wordtGeraaktDoorRaket(raket1) || eve.wordtGeraaktDoorRaket(raket2) || eve.wordtGeraaktDoorRaket(raket3)) {
     eve.verliesLevens();
+  }
+
+  if (!bal.opgegeten && eve.wordtGeraakt(bal)) {
+    bal.opgegeten = true;
+    eve.levens++;
   }
 
   if (eve.gehaald) {
