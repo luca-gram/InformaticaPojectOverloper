@@ -1,9 +1,9 @@
-var aantalLagen = 12;
+var aantalLagen = 10;
 var breedte = 90;
 var hoogte;
 
 class Raster {
-  constructor(r,k) {
+  constructor(r, k) {
     this.aantalRijen = 12;
     this.aantalKolommen = 18;
     this.celGrootte = null;
@@ -13,40 +13,60 @@ class Raster {
     this.celGrootte = canvas.width / this.aantalKolommen;
   }
 
+  muisOpRand() {
+    let kolom = floor(mouseX / this.celGrootte);
+    let rij = floor(mouseY / this.celGrootte);
+
+    let binnenCanvas = mouseX >= 0 && mouseX < canvas.width &&
+                       mouseY >= 0 && mouseY < canvas.height;
+
+    return binnenCanvas && (rij == 0 || rij == this.aantalRijen - 1 ||
+                            kolom == 0 || kolom == this.aantalKolommen - 1);
+  }
+
   teken() {
     push();
     noFill();
     stroke('grey');
-    for (var rij = 0;rij < this.aantalRijen;rij++) {
-      for (var kolom = 0;kolom < this.aantalKolommen;kolom++) {
-        rect(kolom*this.celGrootte,rij*this.celGrootte,this.celGrootte,this.celGrootte);
+    for (var rij = 0; rij < this.aantalRijen; rij++) {
+      for (var kolom = 0; kolom < this.aantalKolommen; kolom++) {
+        rect(kolom * this.celGrootte, rij * this.celGrootte, this.celGrootte, this.celGrootte);
       }
     }
     pop();
   }
 
-achtergrondVeranderen() {
-  let kolom = floor(mouseX / this.celGrootte);
-  let rij = floor(mouseY / this.celGrootte);
+  achtergrondVeranderen() {
+    let kolom = floor(mouseX / this.celGrootte);
+    let rij = floor(mouseY / this.celGrootte);
 
-  if (
-    mouseX >= 0 &&
-    mouseX < canvas.width &&
-    mouseY >= 0 &&
-    mouseY < canvas.height
-  ) {
+    if (mouseX >= 0 && mouseX < canvas.width &&
+        mouseY >= 0 && mouseY < canvas.height) {
+      push();
+      noStroke();
+      fill('lightblue');
+      rect(kolom * this.celGrootte, rij * this.celGrootte,
+           this.celGrootte, this.celGrootte);
+      pop();
+    }
+  }
+
+  tekenRand() {
     push();
     noStroke();
-    fill('lightblue');
-    rect(
-      kolom * this.celGrootte,
-      rij * this.celGrootte,
-      this.celGrootte,
-      this.celGrootte
-    );
+    fill('blue');
+    for (var rij = 0; rij < this.aantalRijen; rij++) {
+      for (var kolom = 0; kolom < this.aantalKolommen; kolom++) {
+        var isRand = rij == 0 || rij == this.aantalRijen - 1 ||
+                     kolom == 0 || kolom == this.aantalKolommen - 1;
+        if (isRand) {
+          rect(kolom * this.celGrootte, rij * this.celGrootte,
+               this.celGrootte, this.celGrootte);
+        }
+      }
+    }
     pop();
   }
-}
 }
 
 class Jos {
@@ -54,18 +74,18 @@ class Jos {
     this.x = 400;
     this.y = 300;
     this.animatie = [];
-    this.frameNummer =  3;
+    this.frameNummer = 3;
     this.stapGrootte = null;
     this.gehaald = false;
-    this.levens = 3
+    this.levens = 3;
   }
 
-verliesLevens() {
-  this.levens--;
-  this.x = 400;
-  this.y = 300;
-}
-  
+  verliesLevens() {
+    this.levens--;
+    this.x = 400;
+    this.y = 300;
+  }
+
   beweeg() {
     if (keyIsDown(65)) {
       this.x -= this.stapGrootte;
@@ -84,8 +104,8 @@ verliesLevens() {
       this.frameNummer = 5;
     }
 
-    this.x = constrain(this.x,0,canvas.width);
-    this.y = constrain(this.y,0,canvas.height - raster.celGrootte);
+    this.x = constrain(this.x, 0, canvas.width);
+    this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
 
     if (this.x == canvas.width) {
       this.gehaald = true;
@@ -93,21 +113,22 @@ verliesLevens() {
   }
 
   wordtGeraakt(vijand) {
-    if (this.x == vijand.x && this.y == vijand.y) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return this.x == vijand.x && this.y == vijand.y;
+  }
+
+  wordtGeraaktDoorRaket(raket) {
+    var zelfdeKolom = this.x == raket.x;
+    var overlaptHoogte = abs(this.y - raket.y) < raster.celGrootte;
+    return zelfdeKolom && overlaptHoogte;
   }
 
   toon() {
-    image(this.animatie[this.frameNummer],this.x,this.y,raster.celGrootte,raster.celGrootte);
+    image(this.animatie[this.frameNummer], this.x, this.y, raster.celGrootte, raster.celGrootte);
   }
-}  
+}
 
 class Vijand {
-  constructor(x,y) {
+  constructor(x, y) {
     this.x = x;
     this.y = y;
     this.sprite = null;
@@ -115,15 +136,46 @@ class Vijand {
   }
 
   beweeg() {
-    this.x += floor(random(-1,2))*this.stapGrootte;
-    this.y += floor(random(-1,2))*this.stapGrootte;
+    this.x += floor(random(-1, 2)) * this.stapGrootte;
+    this.y += floor(random(-1, 2)) * this.stapGrootte;
 
-    this.x = constrain(this.x,0,canvas.width - raster.celGrootte);
-    this.y = constrain(this.y,0,canvas.height - raster.celGrootte);
+    this.x = constrain(this.x, 0, canvas.width - raster.celGrootte);
+    this.y = constrain(this.y, 0, canvas.height - raster.celGrootte);
   }
 
   toon() {
-    image(this.sprite,this.x,this.y,raster.celGrootte,raster.celGrootte);
+    image(this.sprite, this.x, this.y, raster.celGrootte, raster.celGrootte);
+  }
+}
+
+class Raket {
+  constructor(x, startSnelheid) {
+    this.x = x;
+    this.y = canvas.height - raster.celGrootte;
+    this.snelheid = -startSnelheid;
+    this.startSnelheid = startSnelheid;
+    this.valversnelling = 15;
+    this.sprite = null;
+  }
+
+  beweeg() {
+    this.snelheid += this.valversnelling;
+    this.y += this.snelheid;
+
+    if (this.y < 0) {
+      this.y = 0;
+      this.snelheid = 0;
+    }
+
+    var onder = canvas.height - raster.celGrootte;
+    if (this.y > onder) {
+      this.y = onder;
+      this.snelheid = -this.startSnelheid;
+    }
+  }
+
+  toon() {
+    image(this.sprite, this.x, this.y, raster.celGrootte, raster.celGrootte);
   }
 }
 
@@ -132,34 +184,43 @@ function preload() {
 }
 
 function setup() {
-  canvas = createCanvas(900,600);
+  canvas = createCanvas(900, 600);
   canvas.parent();
   frameRate(10);
   textFont("Verdana");
   textSize(90);
 
-  raster = new Raster(6,9);
-
+  raster = new Raster(6, 9);
   raster.berekenCelGrootte();
 
   eve = new Jos();
-  eve.stapGrootte = 1*raster.celGrootte;
-  for (var b = 0;b < 6;b++) {
+  eve.stapGrootte = 1 * raster.celGrootte;
+  for (var b = 0; b < 6; b++) {
     frameEve = loadImage("images/sprites/Eve100px/Eve_" + b + ".png");
     eve.animatie.push(frameEve);
   }
 
-  alice = new Vijand(700,200);
-  alice.stapGrootte = 1*eve.stapGrootte;
+  // raketten: willekeurige kolom rechts van Eve (kolom 9 t/m 17)
+  raket1 = new Raket(floor(random(9, 18)) * raster.celGrootte, 110);
+  raket1.sprite = loadImage("images/sprites/raket.png");
+
+  raket2 = new Raket(floor(random(9, 18)) * raster.celGrootte, 125);
+  raket2.sprite = loadImage("images/sprites/raket.png");
+
+  raket3 = new Raket(floor(random(9, 18)) * raster.celGrootte, 100);
+  raket3.sprite = loadImage("images/sprites/raket.png");
+
+  alice = new Vijand(700, 200);
+  alice.stapGrootte = 1 * eve.stapGrootte;
   alice.sprite = loadImage("images/sprites/Alice100px/Alice.png");
 
-  bob = new Vijand(600,400);
-  bob.stapGrootte = 1*eve.stapGrootte;
-  bob.sprite = loadImage("images/sprites/Bob100px/Bob.png");  
+  bob = new Vijand(600, 400);
+  bob.stapGrootte = 1 * eve.stapGrootte;
+  bob.sprite = loadImage("images/sprites/Bob100px/Bob.png");
 
-  cindy = new Vijand(500,300);
-  cindy.stapGrootte = 1*eve.stapGrootte;
-  cindy.sprite = loadImage("images/sprites/Bob100px/Bob.png");  
+  cindy = new Vijand(500, 300);
+  cindy.stapGrootte = 1 * eve.stapGrootte;
+  cindy.sprite = loadImage("images/sprites/Bob100px/Bob.png");
 }
 
 function AantalLevens() {
@@ -191,8 +252,8 @@ function tekenPiramideAchtergrond() {
   push();
 
   hoogte = breedte / 2;
-  fill('lightslategray');
-  stroke('darkslategray');
+  fill(255, 220, 0, 120);      // geel, doorzichtig
+  stroke(200, 160, 0, 180);    // donkergele rand
 
   var x = (canvas.width - aantalLagen * breedte) / 2;
   var y = (canvas.height - aantalLagen * hoogte) / 2;
@@ -207,9 +268,9 @@ function eindScherm(gewonnen, verloren) {
   if (gewonnen) {
     background('green');
     fill('white');
-    text("Je hebt gewonnen!",30,300);
+    text("Je hebt gewonnen!", 30, 300);
     noLoop();
-   } else if (verloren) {
+  } else if (verloren) {
     background('red');
     fill('black');
     textAlign(CENTER, CENTER);
@@ -219,27 +280,36 @@ function eindScherm(gewonnen, verloren) {
 }
 
 function draw() {
-  background(brug);
+  if (raster.muisOpRand()) {
+    background('orange');   // cursor op de blauwe rand: andere achtergrond
+  } else {
+    background(brug);
+  }
+
   tekenPiramideAchtergrond();
   raster.achtergrondVeranderen();
   raster.teken();
-  push();
-  noFill();
-  stroke('blue');
-  strokeWeight(4);
-  rect(2, 2, width - 4, height - 4);
-  pop();
+  raster.tekenRand();
+
   eve.beweeg();
   alice.beweeg();
   bob.beweeg();
   cindy.beweeg();
+  raket1.beweeg();
+  raket2.beweeg();
+  raket3.beweeg();
+
   eve.toon();
   alice.toon();
   bob.toon();
   cindy.toon();
+  raket1.toon();
+  raket2.toon();
+  raket3.toon();
   AantalLevens();
 
-  if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob) || eve.wordtGeraakt(cindy)) {
+  if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob) || eve.wordtGeraakt(cindy) ||
+      eve.wordtGeraaktDoorRaket(raket1) || eve.wordtGeraaktDoorRaket(raket2) || eve.wordtGeraaktDoorRaket(raket3)) {
     eve.verliesLevens();
   }
 
