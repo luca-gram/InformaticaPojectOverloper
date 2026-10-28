@@ -159,7 +159,7 @@ function draw() {
  
   if (eve.gehaald) {
     eindScherm(true, false);
-} else if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob)) {
+} else if (eve.wordtGeraakt(alice) || eve.wordtGeraakt(bob) || eve.wordtGeraakt(bob)) {
     eindScherm(false, true);
   }
 }
